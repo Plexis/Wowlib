@@ -28,7 +28,7 @@ class Wowlib
         Contains the wowlib revision. This number changes with each wowlib update, but only reflects
         minor changes, that will not affect the wowlib drivers in any way.
     */
-    const REVISION = 11;
+    const REVISION = 12;
     
     // Static Variables
     public static $emulator;                // Emulator string name
@@ -90,7 +90,7 @@ class Wowlib
             if(!empty($DB))
             {
                 try {
-                    self::newRealm(0, $DB);
+                    self::getRealm(0, $DB);
                 }
                 catch( Exception $e ) {
                     // Hush error
@@ -105,10 +105,12 @@ class Wowlib
     
 /*
 | ---------------------------------------------------------------
-| Method: newRealm
+| Method: getRealm
 | ---------------------------------------------------------------
 |
-| This method returns a new instance of the emulators realm class
+| This method returns a realm instance based off of the ID paramenter
+|   if the realm isnt set, a new instance of the emulators realm 
+|   class is initiated and returned
 |
 | @Param: (String | Int) $id - The array key for this realm ID.
 |   Can be a stringname, or Integer, and is used only for when
@@ -124,25 +126,34 @@ class Wowlib
 |           'username' - Database username
 |           'password' - Password to the database username
 |       )
+| @Param: (String) $emu - Specify's which emulator realm we want,
+|   without having to change the emulator
 | @Return (Object) - false if object failed to load
 |
 */
-    public static function newRealm($id = 0, $DB = array())
+    public static function getRealm($id = 0, $DB = array(), $emu = null)
     {
         // Make sure we are loaded here!
         if(!self::$initilized) throw new Exception('Cannot set emulator, Wowlib was never initialized!', 1);
         
+        // If this realm is already set, then just return this realm
+        if(isset(self::$realm[$id])) return self::$realm[$id];
+        
         // Make sure we have DB conection info
         if(empty($DB)) throw new Exception('No Database information supplied. Unable to load realm.');
         
+        // Check if the user is quick changing realms
+        if(!empty($emu) && !in_array($emu, self::$emulators)) return false;
+        
         // Load the emulator class
-        $ucEmu = ucfirst(self::$emulator);
+        if(empty($emu)) $emu = self::$emulator;
+        $ucEmu = ucfirst($emu);
         $class = "\\Wowlib\\". $ucEmu;
         
         // Check and see of the class is already loaded
         if(!class_exists($class, false))
         {
-            $file = path( WOWLIB_ROOT, 'emulators', self::$emulator, $ucEmu .'.php' );
+            $file = path( WOWLIB_ROOT, 'emulators', $emu, $ucEmu .'.php' );
             if(!file_exists($file)) return false;
             require $file;
         }
@@ -157,27 +168,6 @@ class Wowlib
         }
 
         return self::$realm[$id];
-    }
-    
-/*
-| ---------------------------------------------------------------
-| Method: getRealm
-| ---------------------------------------------------------------
-|
-| This method is used to fetch a realm instance that has already 
-|   been created via the newRealm() method
-|
-| @Param: (String | Int) $id - The array key for this realm ID.
-|   It is the same ID used with newRealm() method, or 0 if the
-|   Init() method was used to load the realm
-| @Return (Object) - false if object failed to load
-|
-*/
-    public static function getRealm($id = 0)
-    {
-        // Make sure we are loaded here!
-        if(!self::$initilized) throw new Exception('Cannot load driver, Wowlib was never initialized!', 1);
-        return (isset(self::$realm[$id])) ? self::$realm[$id] : false;
     }
     
 /*

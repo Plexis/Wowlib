@@ -30,6 +30,9 @@ $connC = array(
 
 // === End Configs... Dont edit anything below this line === //
 
+// For benchmarking purposes
+$start = microtime(1);
+
 
 /* 
 | -------------------------------------------------------------- 
@@ -44,7 +47,7 @@ include 'Wowlib.php';
 Wowlib::Init($emulator);
 
 // Fetch realm, and Dump the account id of 5
-$Realm = Wowlib::newRealm('myrealmid', $connA);
+$Realm = Wowlib::getRealm('myrealmid', $connA);
 $Account = $Realm->fetchAccount( $accountId );
 echo "This account username for account id $accountId is ". $Account->getUsername();
 
@@ -69,4 +72,7 @@ else
 {
     echo "<br /><br />Character Doesnt Exist :O";
 }
+
+// Echo benchmark time
+echo "<br /><br />Rendered in ". round(microtime(1) - $start, 4) ." seconds" ;
 ?>
