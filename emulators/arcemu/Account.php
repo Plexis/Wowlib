@@ -1,7 +1,7 @@
 <?php
 /* 
 | -------------------------------------------------------------- 
-| Account Object
+| Arcemu Account Object
 | --------------------------------------------------------------
 |
 | Author:       Steven Wilson
@@ -11,7 +11,7 @@
 */
 namespace Wowlib;
 
-class Account implements iAccount
+class ArcmeuAccount implements iAccount
 {
     // Our Parent wowlib class and Database connection
     protected $DB;

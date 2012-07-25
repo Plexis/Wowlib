@@ -1,7 +1,7 @@
 <?php
 /* 
 | -------------------------------------------------------------- 
-| Account Object
+| Mangos Account Object
 | --------------------------------------------------------------
 |
 | Author:       Wilson212
@@ -11,7 +11,7 @@
 */
 namespace Wowlib;
 
-class Account implements iAccount
+class MangosAccount implements iAccount
 {
     // Our Parent wowlib class and Database connection
     protected $DB;

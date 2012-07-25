@@ -165,7 +165,7 @@ class Arcemu implements iEmulator
     public function fetchAccount($id)
     {
         try {
-            $account = new Account($id, $this);
+            $account = new ArcemuAccount($id, $this);
         }
         catch(\Exception $e) {
             $account = false;

@@ -1,7 +1,7 @@
 <?php
 /* 
 | -------------------------------------------------------------- 
-| RealmId Object
+| Mangos Realm Object
 | --------------------------------------------------------------
 |
 | Author:       Wilson212
@@ -11,7 +11,7 @@
 */
 namespace Wowlib;
 
-class Realm implements iRealm
+class MangosRealm implements iRealm
 {
     // Our Parent wowlib class and Database connection
     protected $DB;

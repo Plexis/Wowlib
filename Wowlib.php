@@ -21,17 +21,18 @@ class Wowlib
         that could cause drivers to not be fully compatible via the interface templates (Ex:
         a new method is added to the Characters class)
     */
-    const VERSION = '1.0';
+    const VERSION = '1.1';
     
     /*
         Constant: REVISION
         Contains the wowlib revision. This number changes with each wowlib update, but only reflects
         minor changes, that will not affect the wowlib drivers in any way.
     */
-    const REVISION = 10;
+    const REVISION = 11;
     
     // Static Variables
     public static $emulator;                // Emulator string name
+    public static $emulators;               // Array of installed emulators
     public static $initTime;                // Initilize time for the wowlib constructor
     protected static $initilized = false;   // Wowlib initialized?
     protected static $realm = array();      // Array of loaded realm instances
@@ -66,12 +67,12 @@ class Wowlib
 
             // Set emulator paths, and scan to see which emulators exist
             $path = path( WOWLIB_ROOT, 'emulators' );
-            $list = wowlib_list_folders($path);
+            self::$emulators = wowlib_list_folders($path);
             
             // Make sure the emulator exists before defining it
-            if(!is_array($list))
+            if(!is_array(self::$emulators))
                 throw new Exception('Unable to open the wowlib emulators folder. Please corretly set your permissions.', 2);
-            elseif(!in_array($emulator, $list))
+            elseif(!in_array($emulator, self::$emulators))
                 throw new Exception('Emulator '. $emulator .' not found in the emulators folder.', 3);
             else
                 self::$emulator = strtolower($emulator);
@@ -226,6 +227,26 @@ class Wowlib
         // List all the drivres in the emulator folder.
         $path = path( WOWLIB_PATH, 'drivers', self::$emulator );
         return wowlib_list_folders($path);
+    }
+    
+/*
+| ---------------------------------------------------------------
+| Method: setEmulator
+| ---------------------------------------------------------------
+|
+| @Return (Bool) - Returns false if the emulator was not found,
+|   true otherwise
+|
+*/
+    public static function setEmulator($emu)
+    {
+        // Make sure we are loaded here!
+        if(!self::$initilized) throw new Exception('Cannot load driver, Wowlib was never initialized!', 1);
+        
+        // List all the drivres in the emulator folder.
+        if(!in_array($emu, self::$emulators)) return false;
+        self::$emulator = $emu;
+        return true;
     }
 }
 
