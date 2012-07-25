@@ -52,4 +52,112 @@ if(!function_exists('path'))
         return $newPath;
     }
 }
+
+/*
+| ---------------------------------------------------------------
+| Function: wowlib_list_files()
+| ---------------------------------------------------------------
+|
+| This method is used to list an array of file names in a directory
+|
+| @Params: (String) - The full path to where we are going
+| @Return: (Array)
+|
+*/
+if(!function_exists('wowlib_list_files'))
+{
+    function wowlib_list_files($path)
+    {
+        // Make sure we have a path, and not a file
+        if(is_dir($path))
+        {
+            // Make sure our path is correct
+            if($path[strlen($path)-1] != DS) $path = $path . DS;
+            
+            // Open the directory
+            $handle = @opendir($path);
+            if ($handle === false) return false;
+            
+            // Files array
+            $files = array();
+            
+            // Loop through each file
+            while(false !== ($f = readdir($handle)))
+            {
+                // Skip "." and ".." directories
+                if($f == "." || $f == "..") continue;
+
+                // make sure we establish the full path to the file again
+                $file = $path . $f;
+                
+                // If is directory, call this method again to loop and delete ALL sub dirs.
+                if( !is_dir($file) ) 
+                {
+                    $files[] = $f;
+                }
+            }
+            
+            // Close our path
+            closedir($handle);
+            return $files;
+        }
+        return false;
+    }
+}
+
+/*
+| ---------------------------------------------------------------
+| Function: wowlib_list_folders()
+| ---------------------------------------------------------------
+|
+| This method is used to get an array of folders within a directory
+|
+| @Params: (String) - The full path to where we are going
+| @Return: (Array):
+|       array(
+|           0 => "foldername"
+|           1 => "foldername"
+|       );
+|
+*/
+if(!function_exists('wowlib_list_folders'))
+{
+    function wowlib_list_folders($path)
+    {
+        // Make sure we have a path, and not a file
+        if(is_dir($path))
+        {
+            // Make sure our path is correct
+            if($path[strlen($path)-1] != DS) $path = $path . DS;
+            
+            // Open the directory
+            $handle = @opendir($path);
+            if ($handle === false) return false;
+            
+            // Folders array
+            $folders = array();
+            
+            // Loop through each file
+            while(false !== ($f = readdir($handle)))
+            {
+                // Skip "." and ".." directories
+                if($f == "." || $f == "..") continue;
+
+                // make sure we establish the full path to the file again
+                $file = $path . $f;
+                
+                // If is directory, call this method again to loop and delete ALL sub dirs.
+                if(is_dir($file)) 
+                {
+                    $folders[] = $f;
+                }
+            }
+            
+            // Close our path
+            closedir($handle);
+            return $folders;
+        }
+        return false;
+    }
+}
 ?>
