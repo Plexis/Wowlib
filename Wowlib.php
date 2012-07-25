@@ -131,10 +131,21 @@ class Wowlib
 |
 | @Param: (String) $emu - If passed, the Emulator class of this
 |   Emu will be returned
+| @Params: (Array) $DB - An array of database connection 
+|   information as defined below. Not needed unless loading a new
+|   realm that is previously unloaded
+|       array(
+|           'driver' - Mysql, Postgres etc etc
+|           'host' - Hostname
+|           'port' - Port Number
+|           'database' - Database name
+|           'username' - Database username
+|           'password' - Password to the database username
+|       )
 | @Return (Object) - false if object failed to load
 |
 */
-    public static function getRealm($emu = null)
+    public static function getRealm($emu = null, $DB = array())
     {
         // Make sure we are loaded here!
         if(!self::$initilized) throw new Exception('Cannot fetch realm, Wowlib was never initialized!');
@@ -144,6 +155,9 @@ class Wowlib
         {
             if(!isset(self::$realm[$emu]))
             {
+                // Make sure we have DB conection info
+                if(empty($DB)) throw new Exception('No Database information supplied. Unable to load realm.');
+                
                 // Load the emulator class
                 $ucEmu = ucfirst($emu);
                 $file = path(self::$rootPath, 'emulators', $emu, $ucEmu .'.php');
@@ -153,7 +167,8 @@ class Wowlib
                 // Init the realm class
                 try {
                     $class = "\\Wowlib\\". $ucEmu;
-                    self::$realm[$emu] = new $class( self::$RDB );
+                    $DB = new \Wowlib\Database($DB);
+                    self::$realm[$emu] = new $class( $DB );
                 }
                 catch( \Exception $e) {
                     self::$realm[$emu] = false;
