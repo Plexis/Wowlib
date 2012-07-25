@@ -15,15 +15,25 @@
 
 class Wowlib
 {
-    // Wowlib Constants
+    /*
+        Constant: VERSION
+        Contains the wowlib version. This constant only changes when the wowlib makes a change, 
+        that could cause drivers to not be fully compatible via the interface templates (Ex:
+        a new method is added to the Characters class)
+    */
     const VERSION = '1.0';
-    const REVISION = 4;
+    
+    /*
+        Constant: REVISION
+        Contains the wowlib revision. This number changes with each wowlib update, but only reflects
+        minor changes, that will not affect the wowlib drivers in any way.
+    */
+    const REVISION = 5;
     
     // Static Variables
-    public static $emulator;
-    public static $rootPath;
-    protected static $initilized = false;
-    protected static $realm = array();
+    public static $emulator;                // Emulator string name
+    protected static $initilized = false;   // Wowlib initialized?
+    protected static $realm = array();      // Array of loaded realm instances
     
 
 /*
@@ -45,28 +55,23 @@ class Wowlib
 | @Return (None) - nothing is returned
 |
 */
-    public static function Init($emulator, $DB)
+    public static function Init($emulator, $DB = array())
     {
         // Load some things just once
         if(!self::$initilized)
         {
-            // Define our root dir
-            self::$rootPath = dirname(__FILE__);
-            
-            // Load the realm database connection
-            try {
-                $DB = new \Wowlib\Database($DB);
-            }
-            catch(Exception $e) {
-                throw new Exception( $e->getMessage() );
-            }
+            // Load the wowlib required files
+            if(!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
+            if(!defined('WOWLIB_ROOT')) define('WOWLIB_ROOT', dirname(__FILE__));
+            require WOWLIB_ROOT . DS .'inc'. DS .'Functions.php';
+            require WOWLIB_ROOT . DS .'inc'. DS .'Database.php';
+            require WOWLIB_ROOT . DS .'drivers'. DS .'Driver.php';
             
             // Set Emulator Variable
             self::$emulator = strtolower($emulator);
-            $ucEmu = ucfirst(self::$emulator);
             
             // Autoload Interfaces
-            $path = path( self::$rootPath, 'interfaces' );
+            $path = path( WOWLIB_ROOT, 'interfaces' );
             $list = scandir($path);
             foreach($list as $file)
             {
@@ -74,24 +79,87 @@ class Wowlib
                 include path($path, $file);
             }
             
-            // Load the emulator, and the driver class
-            require_once path(self::$rootPath, 'drivers', 'Driver.php');
-            $file = path(self::$rootPath, 'emulators', self::$emulator, $ucEmu .'.php');
-            if(!file_exists($file)) throw new Exception("Emulator '". self::$emulator ."' Doesnt Exist");
-            require_once $file;
-            
-            // Init the realm class
-            try {
-                $class = "\\Wowlib\\". $ucEmu;
-                self::$realm[self::$emulator] = new $class( $DB );
-            }
-            catch( \Exception $e) {
-                self::$realm[self::$emulator] = false;
+            // If DB information was passed, then init a new realm connection
+            if(!empty($DB))
+            {
+                try {
+                    self::newRealm(0, $DB);
+                }
+                catch( Exception $e ) {
+                    // Hush error
+                }
             }
             
             // Set that we are initialized
             self::$initilized = true;
         }
+    }
+    
+/*
+| ---------------------------------------------------------------
+| Realm Loader
+| ---------------------------------------------------------------
+|
+| @Param: (String | Int) $id - The array key for this realm ID.
+|   Can be a stringname, or Integer, and is used only for when
+|   you need to use the getRealm() method.
+| @Params: (Array) $DB - An array of database connection 
+|   information as defined below. Not needed unless loading a new
+|   realm that is previously unloaded
+|       array(
+|           'driver' - Mysql, Postgres etc etc
+|           'host' - Hostname
+|           'port' - Port Number
+|           'database' - Database name
+|           'username' - Database username
+|           'password' - Password to the database username
+|       )
+| @Return (Object) - false if object failed to load
+|
+*/
+    public static function newRealm($id = 0, $DB = array())
+    {
+        // Make sure we are loaded here!
+        if(!self::$initilized) throw new Exception('Cannot set emulator, Wowlib was never initialized!');
+        
+        // Make sure we have DB conection info
+        if(empty($DB)) throw new Exception('No Database information supplied. Unable to load realm.');
+        
+        // Load the emulator class
+        $ucEmu = ucfirst(self::$emulator);
+        $file = path( WOWLIB_ROOT, 'emulators', self::$emulator, $ucEmu .'.php' );
+        if(!file_exists($file)) return false;
+        require_once $file;
+        
+        // Init the realm class
+        try {
+            $class = "\\Wowlib\\". $ucEmu;
+            $DB = new \Wowlib\Database($DB);
+            self::$realm[$id] = new $class( $DB );
+        }
+        catch( \Exception $e) {
+            self::$realm[$id] = false;
+        }
+
+        return self::$realm[$id];
+    }
+    
+/*
+| ---------------------------------------------------------------
+| Realm Fetcher
+| ---------------------------------------------------------------
+|
+| @Param: (String | Int) $id - The array key for this realm ID.
+|   It is the same ID used with newRealm() method, or 0 if the
+|   Init() method was used to load the realm
+| @Return (Object) - false if object failed to load
+|
+*/
+    public static function getRealm($id = 0)
+    {
+        // Make sure we are loaded here!
+        if(!self::$initilized) throw new Exception('Cannot load driver, Wowlib was never initialized!');
+        return (isset(self::$realm[$id])) ? self::$realm[$id] : false;
     }
     
 /*
@@ -121,83 +189,5 @@ class Wowlib
         // Load a new instance of the Driver class
         return new \Wowlib\Driver(self::$emulator, $driver, $char, $world);
     }
-    
-/*
-| ---------------------------------------------------------------
-| Realm Loader
-| ---------------------------------------------------------------
-|
-| @Param: (String) $emu - If passed, the Emulator class of this
-|   Emu will be returned
-| @Params: (Array) $DB - An array of database connection 
-|   information as defined below. Not needed unless loading a new
-|   realm that is previously unloaded
-|       array(
-|           'driver' - Mysql, Postgres etc etc
-|           'host' - Hostname
-|           'port' - Port Number
-|           'database' - Database name
-|           'username' - Database username
-|           'password' - Password to the database username
-|       )
-| @Return (Object) - false if object failed to load
-|
-*/
-    public static function getRealm($emu = null, $DB = array())
-    {
-        // Make sure we are loaded here!
-        if(!self::$initilized) throw new Exception('Cannot fetch realm, Wowlib was never initialized!');
-
-        // If we have specified an emulator, load it, and return it
-        if($emu != null)
-        {
-            if(!isset(self::$realm[$emu]))
-            {
-                // Make sure we have DB conection info
-                if(empty($DB)) throw new Exception('No Database information supplied. Unable to load realm.');
-                
-                // Load the emulator class
-                $ucEmu = ucfirst($emu);
-                $file = path(self::$rootPath, 'emulators', $emu, $ucEmu .'.php');
-                if(!file_exists($file)) return false;
-                require_once $file;
-                
-                // Init the realm class
-                try {
-                    $class = "\\Wowlib\\". $ucEmu;
-                    $DB = new \Wowlib\Database($DB);
-                    self::$realm[$emu] = new $class( $DB );
-                }
-                catch( \Exception $e) {
-                    self::$realm[$emu] = false;
-                }
-            }
-            return self::$realm[$emu];
-        }
-        return self::$realm[self::$emulator];
-    }
-    
-/*
-| ---------------------------------------------------------------
-| Emulator Setter
-| ---------------------------------------------------------------
-|
-| @Param: (String) $emu - The emulator name we are switching to
-| @Return (None) - nothing is returned
-|
-*/
-    public static function setEmulator($emu, $DB = array())
-    {
-        // Make sure we are loaded here!
-        if(!self::$initilized) throw new Exception('Cannot set emulator, Wowlib was never initialized!');
-        
-        // Set Emulator Variable
-        self::$emulator = strtolower($emu);
-    }
 }
-
-// Require our database and functions files
-if(!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
-require Wowlib::$rootPath . DS . 'inc'. DS .'Functions.php';
-require Wowlib::$rootPath . DS . 'inc'. DS .'Database.php';
 ?>

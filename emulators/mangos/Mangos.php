@@ -30,9 +30,8 @@ class Mangos implements iEmulator
         $this->DB = $DB;
         
         // Load our extensions needed
-        $root = \Wowlib::$rootPath;
-        require_once path($root, 'emulators', 'mangos', 'Account.php');
-        require_once path($root, 'emulators', 'mangos', 'Realm.php');
+        require_once path( WOWLIB_ROOT, 'emulators', 'mangos', 'Account.php' );
+        require_once path( WOWLIB_ROOT, 'emulators', 'mangos', 'Realm.php' );
     }
     
 /*

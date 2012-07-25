@@ -41,10 +41,10 @@ $connC = array(
 include 'Wowlib.php';
 
 // Init the wowlib
-Wowlib::Init($emulator, $connA);
+Wowlib::Init($emulator);
 
 // Fetch realm, and Dump the account id of 5
-$Realm = Wowlib::getRealm();
+$Realm = Wowlib::newRealm('myrealmid', $connA);
 $Account = $Realm->fetchAccount( $accountId );
 echo "This account username for account id $accountId is ". $Account->getUsername();
 

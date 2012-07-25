@@ -30,8 +30,7 @@ class Arcemu implements iEmulator
         $this->DB = $DB;
         
         // Load our extensions needed
-        $root = \Wowlib::$rootPath;
-        require_once path($root, 'emulators', 'arcemu', 'Account.php');
+        require_once path( WOWLIB_ROOT, 'emulators', 'arcemu', 'Account.php' );
     }
     
 /*

@@ -34,21 +34,29 @@ class Driver
     public function __construct($emulator, $driver, $char, $world)
     {
         // Load the character DB
-        try {
-            $this->CDB = new \Wowlib\Database($char);
-        }
-        catch(\Exception $e) {
+        if(!is_array($char)):
             $this->CDB = false;
-        }
+        else:
+            try {
+                $this->CDB = new \Wowlib\Database($char);
+            }
+            catch(\Exception $e) {
+                $this->CDB = false;
+            }
+        endif;
         
         
         // Load world DB
-        try {
-            $this->WDB = new \Wowlib\Database($world);
-        }
-        catch(\Exception $e) {
+        if(!is_array($world)):
             $this->WDB = false;
-        }
+        else:
+            try {
+                $this->WDB = new \Wowlib\Database($world);
+            }
+            catch(\Exception $e) {
+                $this->WDB = false;
+            }
+        endif;
 
         // Finally set our emulator and driver variables
         $this->emulator = $emulator;
@@ -72,7 +80,7 @@ class Driver
         $driver = strtolower($this->driver);
         
         // Check for the extension
-		$file = path( \Wowlib::$rootPath, 'drivers', $this->emulator, $driver, $class .'.php' );
+		$file = path( WOWLIB_ROOT, 'drivers', $this->emulator, $driver, $class .'.php' );
         if( !file_exists( $file ) )
         {
             // Extension doesnt exists :O
