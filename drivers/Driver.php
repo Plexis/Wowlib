@@ -33,9 +33,6 @@ class Driver
 */
     public function __construct($emulator, $driver, $char, $world)
     {
-        // Load the Loader class
-        $this->load = load_class('Loader');
-        
         // Load the character DB
         try {
             $this->CDB = new \Wowlib\Database($char);

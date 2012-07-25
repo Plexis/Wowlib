@@ -17,12 +17,9 @@ class Wowlib
 {
     // Wowlib Constants
     const VERSION = '1.0';
-    const REVISION = '3';
+    const REVISION = 4;
     
-    // Our realm DB Connection
-    public static $RDB;
-    
-    // Static Instances
+    // Static Variables
     public static $emulator;
     public static $rootPath;
     protected static $initilized = false;
@@ -58,7 +55,7 @@ class Wowlib
             
             // Load the realm database connection
             try {
-                self::$RDB = new \Wowlib\Database($DB);
+                $DB = new \Wowlib\Database($DB);
             }
             catch(Exception $e) {
                 throw new Exception( $e->getMessage() );
@@ -86,7 +83,7 @@ class Wowlib
             // Init the realm class
             try {
                 $class = "\\Wowlib\\". $ucEmu;
-                self::$realm[self::$emulator] = new $class( self::$RDB );
+                self::$realm[self::$emulator] = new $class( $DB );
             }
             catch( \Exception $e) {
                 self::$realm[self::$emulator] = false;
@@ -150,7 +147,7 @@ class Wowlib
     {
         // Make sure we are loaded here!
         if(!self::$initilized) throw new Exception('Cannot fetch realm, Wowlib was never initialized!');
-        
+
         // If we have specified an emulator, load it, and return it
         if($emu != null)
         {
@@ -189,7 +186,7 @@ class Wowlib
 | @Return (None) - nothing is returned
 |
 */
-    public static function setEmulator($emu)
+    public static function setEmulator($emu, $DB = array())
     {
         // Make sure we are loaded here!
         if(!self::$initilized) throw new Exception('Cannot set emulator, Wowlib was never initialized!');
