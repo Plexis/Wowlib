@@ -17,6 +17,7 @@ class Wowlib
 {
     // Wowlib Constants
     const VERSION = '1.0';
+    const REVISION = '3';
     
     // Our realm DB Connection
     public static $RDB;
@@ -72,7 +73,7 @@ class Wowlib
             $list = scandir($path);
             foreach($list as $file)
             {
-                if($file == '.' || $file == '..'); continue; 
+                if($file == '.' || $file == '..') continue; 
                 include path($path, $file);
             }
             
