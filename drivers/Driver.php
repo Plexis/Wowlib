@@ -81,12 +81,9 @@ class Driver
         
         // Check for the extension
 		$file = path( WOWLIB_ROOT, 'drivers', $this->emulator, $driver, $class .'.php' );
-        if( !file_exists( $file ) )
-        {
-            // Extension doesnt exists :O
-            show_error('Failed to load wowlib extentsion %s', array($name), E_ERROR);
-            return false;
-        }
+        
+        // If extension doesnt exist, return false
+        if( !file_exists( $file ) ) return false;
         
         // Load the extension file
         require_once( $file );
