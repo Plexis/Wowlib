@@ -28,7 +28,7 @@ class Wowlib
         Contains the wowlib revision. This number changes with each wowlib update, but only reflects
         minor changes, that will not affect the wowlib drivers in any way.
     */
-    const REVISION = 9;
+    const REVISION = 10;
     
     // Static Variables
     public static $emulator;                // Emulator string name
@@ -63,14 +63,7 @@ class Wowlib
         {
             // Init a start time for benchmarking
             $start = microtime(1);
-            
-            // Load the wowlib required files
-            if(!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
-            if(!defined('WOWLIB_ROOT')) define('WOWLIB_ROOT', dirname(__FILE__));
-            require WOWLIB_ROOT . DS .'inc'. DS .'Functions.php';
-            require WOWLIB_ROOT . DS .'inc'. DS .'Database.php';
-            require WOWLIB_ROOT . DS .'drivers'. DS .'Driver.php';
-            
+
             // Set emulator paths, and scan to see which emulators exist
             $path = path( WOWLIB_ROOT, 'emulators' );
             $list = wowlib_list_folders($path);
@@ -143,13 +136,18 @@ class Wowlib
         
         // Load the emulator class
         $ucEmu = ucfirst(self::$emulator);
-        $file = path( WOWLIB_ROOT, 'emulators', self::$emulator, $ucEmu .'.php' );
-        if(!file_exists($file)) return false;
-        require_once $file;
+        $class = "\\Wowlib\\". $ucEmu;
+        
+        // Check and see of the class is already loaded
+        if(!class_exists($class, false))
+        {
+            $file = path( WOWLIB_ROOT, 'emulators', self::$emulator, $ucEmu .'.php' );
+            if(!file_exists($file)) return false;
+            require $file;
+        }
         
         // Init the realm class
         try {
-            $class = "\\Wowlib\\". $ucEmu;
             $DB = new \Wowlib\Database($DB);
             self::$realm[$id] = new $class( $DB );
         }
@@ -230,4 +228,11 @@ class Wowlib
         return wowlib_list_folders($path);
     }
 }
+
+// Define wowlib constants, and load the wowlib required files
+if(!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
+if(!defined('WOWLIB_ROOT')) define('WOWLIB_ROOT', dirname(__FILE__));
+require WOWLIB_ROOT . DS .'inc'. DS .'Functions.php';
+require WOWLIB_ROOT . DS .'inc'. DS .'Database.php';
+require WOWLIB_ROOT . DS .'drivers'. DS .'Driver.php';
 ?>
