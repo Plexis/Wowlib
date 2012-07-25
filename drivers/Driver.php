@@ -78,6 +78,7 @@ class Driver
         // Create our classname
         $class = ucfirst( $name );
         $driver = strtolower($this->driver);
+        $ucEmu = ucfirst($this->emulator);
         
         // Check for the extension
 		$file = path( WOWLIB_ROOT, 'drivers', $this->emulator, $driver, $class .'.php' );
@@ -89,7 +90,7 @@ class Driver
         require_once( $file );
         
         // Load the class
-        $class = "\\Wowlib\\{$this->driver}\\". $class;
+        $class = "\\Wowlib\\{$ucEmu}\\{$this->driver}\\{$class}";
         try {
             $this->{$name} = new $class($this);
         }

@@ -65,7 +65,7 @@ class Mangos implements iEmulator
     public function fetchRealm($id)
     {
         try {
-            $realm = new MangosRealm($id, $this);
+            $realm = new Mangos\Realm($id, $this);
         }
         catch (\Exception $e) {
             $realm = false;
@@ -179,7 +179,7 @@ class Mangos implements iEmulator
     public function fetchAccount($id)
     {
         try {
-            $account = new MangosAccount($id, $this);
+            $account = new Mangos\Account($id, $this);
         }
         catch(\Exception $e) {
             $account = false;

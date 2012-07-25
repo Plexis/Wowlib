@@ -65,7 +65,7 @@ class Trinity implements iEmulator
     public function fetchRealm($id)
     {
         try {
-            $realm = new TrinityRealm($id, $this);
+            $realm = new Trinity\Realm($id, $this);
         }
         catch (\Exception $e) {
             $realm = false;
@@ -180,7 +180,7 @@ class Trinity implements iEmulator
     {
         // Try to load the class
         try {
-            $account = new TrinityAccount($id, $this);
+            $account = new Trinity\Account($id, $this);
         }
         catch(\Exception $e) {
             $account = false;

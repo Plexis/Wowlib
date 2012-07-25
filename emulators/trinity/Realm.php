@@ -9,9 +9,11 @@
 | License:      GNU GPL v3
 |
 */
-namespace Wowlib;
 
-class TrinityRealm implements iRealm
+// All namespace paths are uppercase first. Format: Wowlib\<Emulator>;
+namespace Wowlib\Trinity;
+
+class Realm implements \Wowlib\iRealm
 {
     // Our Parent wowlib class and Database connection
     protected $DB;

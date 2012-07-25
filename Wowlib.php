@@ -21,14 +21,14 @@ class Wowlib
         that could cause drivers to not be fully compatible via the interface templates (Ex:
         a new method is added to the Characters class)
     */
-    const VERSION = '1.1';
+    const VERSION = '1.2';
     
     /*
         Constant: REVISION
         Contains the wowlib revision. This number changes with each wowlib update, but only reflects
         minor changes, that will not affect the wowlib drivers in any way.
     */
-    const REVISION = 12;
+    const REVISION = 13;
     
     // Static Variables
     public static $emulator;                // Emulator string name

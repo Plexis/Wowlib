@@ -9,9 +9,11 @@
 | License:      GNU GPL v3
 |
 */
-namespace Wowlib;
 
-class TrinityAccount implements iAccount
+// All namespace paths are uppercase first. Format: Wowlib\<Emulator>;
+namespace Wowlib\Trinity;
+
+class Account implements \Wowlib\iAccount
 {
     // Our Parent wowlib class and Database connection
     protected $DB;
