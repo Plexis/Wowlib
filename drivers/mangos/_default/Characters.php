@@ -211,47 +211,6 @@ class Characters implements \Wowlib\iCharacters
         // If we have a false return, then there was nothing to select
         return ($list === FALSE) ? array() : $list;
     }
-    
-/*
-| ---------------------------------------------------------------
-| Method: listCharactersDatatables
-| ---------------------------------------------------------------
-|
-| This method returns a list of characters, formatted for datatables
-| ajax.
-|
-| @Param: (Int) $acct - The account ID. 0 = all characters from all
-|   accounts
-| @Param: (Bool) $online - Only list online players?
-| @Retrun: (Array): An array of characters
-|
-*/     
-    public function listCharactersDatatables($acct = 0, $online = false)
-    {
-        // Load the ajax model
-        $ajax = load_class('Loader')->model("Ajax_Model", "ajax");
-  
-        /* 
-        * Dwsc: Array of database columns which should be read and sent back to DataTables. 
-        * Format: id, name, character level, race ID, class ID, Gender ID, Zone ID, Account ID, And status
-        */
-        $cols = array( 'guid', 'name', 'level', 'race', 'class', 'gender', 'zone', 'account', 'online' );
-        
-        /* Character ID column name */
-        $index = "guid";
-        
-        /* characters table name to use */
-        $table = "characters";
-        
-        /* where statment */
-        $where = ($online == true) ? '`online` = 1' : '';
-        
-        /* And Where statment */
-        if($acct != 0) $where .= ($online == true) ? ' AND `account` = '. $acct : '`account` = '. $acct;
-        
-        /* Process the request */
-        return $ajax->process_datatables($cols, $index, $table, $where, $this->DB);
-    }
 
 /*
 | ---------------------------------------------------------------
@@ -268,22 +227,22 @@ class Characters implements \Wowlib\iCharacters
 |
 */      
     function topKills($faction, $limit, $start)
-	{
-		// Alliance
-		if($faction == 1)
-		{			
-			$row = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level` FROM `characters` WHERE `totalkills` > 0 AND (
-				`race` = 1 OR `race` = 3 OR `race` = 4 OR `race` = 7 OR `race` = 11) ORDER BY `totalkills` DESC LIMIT $start, $limit";
-		}
-		else # Horde
-		{			
-			$row = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level` FROM `characters` WHERE `totalkills` > 0 AND (
-				`race` = 2 OR `race` = 5 OR `race` = 6 OR `race` = 8 OR `race` = 10) ORDER BY `totalkills` DESC LIMIT $start, $limit";
-		}
-		
+    {
+        // Alliance
+        if($faction == 1)
+        {			
+            $row = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level` FROM `characters` WHERE `totalkills` > 0 AND (
+                `race` = 1 OR `race` = 3 OR `race` = 4 OR `race` = 7 OR `race` = 11) ORDER BY `totalkills` DESC LIMIT $start, $limit";
+        }
+        else # Horde
+        {			
+            $row = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level` FROM `characters` WHERE `totalkills` > 0 AND (
+                `race` = 2 OR `race` = 5 OR `race` = 6 OR `race` = 8 OR `race` = 10) ORDER BY `totalkills` DESC LIMIT $start, $limit";
+        }
+        
         // Return the query result
         return $this->DB->query( $query )->fetchAll();
-	}
+    }
  
 /*
 | ---------------------------------------------------------------

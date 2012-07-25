@@ -211,47 +211,6 @@ class Characters implements \Wowlib\iCharacters
         // If we have a false return, then there was nothing to select
         return ($list === FALSE) ? array() : $list;
     }
-    
-/*
-| ---------------------------------------------------------------
-| Method: listCharactersDatatables
-| ---------------------------------------------------------------
-|
-| This method returns a list of characters, formatted for datatables
-| ajax.
-|
-| @Param: (Int) $acct - The account ID. 0 = all characters from all
-|   accounts
-| @Param: (Bool) $online - Only list online players?
-| @Retrun: (Array): An array of characters
-|
-*/     
-    public function listCharactersDatatables($acct = 0, $online = false)
-    {
-        // Load the ajax model
-        $ajax = load_class('Loader')->model("Ajax_Model", "ajax");
-  
-        /* 
-        * Dwsc: Array of database columns which should be read and sent back to DataTables. 
-        * Format: id, name, character level, race ID, class ID, Gender ID, Zone ID, Account ID, And status
-        */
-        $cols = array( 'guid', 'name', 'level', 'race', 'class', 'gender', 'zoneId', 'acct', 'online' );
-        
-        /* Character ID column name */
-        $index = "guid";
-        
-        /* characters table name to use */
-        $table = "characters";
-        
-        /* where statment */
-        $where = ($online == true) ? '`online` = 1' : '';
-        
-        /* And Where statment */
-        if($acct != 0) $where .= ($online == true) ? ' AND `acct` = '. $acct : '`acct` = '. $acct;
-        
-        /* Process the request */
-        return $ajax->process_datatables($cols, $index, $table, $where, $this->DB);
-    }
 
 /*
 | ---------------------------------------------------------------
@@ -268,22 +227,22 @@ class Characters implements \Wowlib\iCharacters
 |
 */      
     function topKills($faction, $limit, $start)
-	{
-		// Alliance
-		if($faction == 1)
-		{			
-			$row = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level` FROM `characters` WHERE `killsLifeTiem` > 0 AND (
-				`race` = 1 OR `race` = 3 OR `race` = 4 OR `race` = 7 OR `race` = 11) ORDER BY `killsLifeTime` DESC LIMIT $start, $limit";
-		}
-		else # Horde
-		{			
-			$row = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level` FROM `characters` WHERE `killsLifeTime` > 0 AND (
-				`race` = 2 OR `race` = 5 OR `race` = 6 OR `race` = 8 OR `race` = 10) ORDER BY `killsLifeTime` DESC LIMIT $start, $limit";
-		}
-		
+    {
+        // Alliance
+        if($faction == 1)
+        {			
+            $row = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level` FROM `characters` WHERE `killsLifeTiem` > 0 AND (
+                `race` = 1 OR `race` = 3 OR `race` = 4 OR `race` = 7 OR `race` = 11) ORDER BY `killsLifeTime` DESC LIMIT $start, $limit";
+        }
+        else # Horde
+        {			
+            $row = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level` FROM `characters` WHERE `killsLifeTime` > 0 AND (
+                `race` = 2 OR `race` = 5 OR `race` = 6 OR `race` = 8 OR `race` = 10) ORDER BY `killsLifeTime` DESC LIMIT $start, $limit";
+        }
+        
         // Return the query result
         return $this->DB->query( $query )->fetchAll();
-	}
+    }
  
 /*
 | ---------------------------------------------------------------
@@ -361,7 +320,7 @@ class Characters implements \Wowlib\iCharacters
     public function flagToBit($flag)
     {
         //This method is not needed for arcemu.
-		return null;
+        return null;
     }
     
     
@@ -480,15 +439,15 @@ class Character
             `orientation`,
             `online`,
             `playedtime`,
-			`forced_rename_pending`,
+            `forced_rename_pending`,
             `zoneId`,
             `arenaPoints`,
             `honorPoints`,
             `killsLifeTime`,
-			`bindpositionX`,
-			`bindpositionY`,
-			`bindpositionZ`,
-			`bindmapId`,
+            `bindpositionX`,
+            `bindpositionY`,
+            `bindpositionZ`,
+            `bindmapId`,
             FROM `characters` WHERE `guid`= $guid;";
         $this->data = $this->DB->query($query)->fetchRow();
         
@@ -705,8 +664,8 @@ class Character
 */  
     public function getTimePlayed()
     {
-		$timePlayed = explode( " ", $this->data["playedtime"] );
-		return ((int) $timePlayed[0]); //Total time played.
+        $timePlayed = explode( " ", $this->data["playedtime"] );
+        return ((int) $timePlayed[0]); //Total time played.
     }
     
 /*
@@ -855,8 +814,8 @@ class Character
         // Determine if each flag is true or false
         foreach($flags as $key => $flag)
         {
-			if( $key == "rename" )
-				$flags[$key] = ($cflags === 1) ? true : false;
+            if( $key == "rename" )
+                $flags[$key] = ($cflags === 1) ? true : false;
         }
         
         return $flags;
@@ -877,10 +836,10 @@ class Character
     public function hasLoginFlag($name)
     {
         $renameFlag = $this->data["forced_rename_pending"];
-		
-		if( $name == "rename" )
-			return ( $renameFlag === 1 ) ? true : false;
-		else return false;
+        
+        if( $name == "rename" )
+            return ( $renameFlag === 1 ) ? true : false;
+        else return false;
     }
     
 /*
