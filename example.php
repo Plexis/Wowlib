@@ -11,21 +11,21 @@ $charId = 1;            // Enter a character ID that exists in your character DB
 
 // Auth / Login Database Server Connection
 $connA = array(
-    'driver'	   => 'mysql',
-    'host'         => 'localhost',
-    'port'         => '3306',
-    'username'     => 'admin',
-    'password'     => 'admin',
-    'database'     => 'auth'
+    'driver'    => 'mysql',
+    'host'      => 'localhost',
+    'port'      => '3306',
+    'username'  => 'admin',
+    'password'  => 'admin',
+    'database'  => 'auth'
 );
 // Character Database Server Connection
 $connC = array(
-    'driver'	   => 'mysql',
-    'host'         => 'localhost',
-    'port'         => '3306',
-    'username'     => 'admin',
-    'password'     => 'admin',
-    'database'     => 'characters'
+    'driver'    => 'mysql',
+    'host'      => 'localhost',
+    'port'      => '3306',
+    'username'  => 'admin',
+    'password'  => 'admin',
+    'database'  => 'characters'
 );
 
 // === End Configs... Dont edit anything below this line === //
