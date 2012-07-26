@@ -28,7 +28,7 @@ class Wowlib
         Contains the wowlib revision. This number changes with each wowlib update, but only reflects
         minor changes, that will not affect the wowlib drivers in any way.
     */
-    const REVISION = 13;
+    const REVISION = 14;
     
     // Static Variables
     public static $emulator;                // Emulator string name
@@ -86,6 +86,9 @@ class Wowlib
             // Autload each interface so the class' dont have to
             foreach($list as $file) include path($path, $file);
             
+            // Set that we are initialized
+            self::$initilized = true;
+            
             // If DB information was passed, then init a new realm connection
             if(!empty($DB))
             {
@@ -97,8 +100,7 @@ class Wowlib
                 }
             }
             
-            // Set that we are initialized
-            self::$initilized = true;
+            // Set Init time
             self::$initTime = round( microtime(1) - $start, 5);
         }
     }
