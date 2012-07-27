@@ -41,14 +41,32 @@ class Trinity implements iEmulator
 |
 | This function gets the realmlist from the database
 |
-| @Return (Array) - Returns an array of realms and thier columns
+| @Return (Array) - Returns an array of Realm objects
 |
 */
     public function realmlist()
     {
         // Grab Realms
-        $query = "SELECT * FROM `realmlist` ORDER BY `id`";
-        return $this->DB->query( $query )->fetchAll();
+        $query = "SELECT
+            `id`,
+            `name`,
+            `address`,
+            `port`,
+            `icon`,
+            `flag`,
+            `population`,
+            `gamebuild`
+            FROM `realmlist` ORDER BY `id`";
+        $this->DB->query( $query );
+        
+        // Build the array of realm objects
+        $realms = array();
+        while($row = $this->DB->fetchRow())
+        {
+            $realms[] = new Trinity\Realm($row, $this);
+        }
+        
+        return $realms;
     }
     
 /*

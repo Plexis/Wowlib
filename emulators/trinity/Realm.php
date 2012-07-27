@@ -19,7 +19,7 @@ class Realm implements \Wowlib\iRealm
     protected $DB;
     protected $parent;
     
-    // Account ID and User data array
+    // Realm data array
     protected $data = array();
 /*
 | ---------------------------------------------------------------
@@ -32,22 +32,29 @@ class Realm implements \Wowlib\iRealm
         // Load the realm database connection
         $this->DB = $parent->DB;
         
-        // Load the user
-        // Check the Realm DB for this username
-        $query = "SELECT
-            `id`,
-            `name`,
-            `address`,
-            `port`,
-            `icon`,
-            `flag`,
-            `population`,
-            `gamebuild`
-            FROM `realmlist` WHERE `id`= ?";
-        $this->data = $this->DB->query( $query, array($id) )->fetchRow();
-        
-        // If the result is NOT false, we have a match, username is taken
-        if(!is_array($this->data)) throw new \Exception('Realm Doesnt Exist');
+        // Check if data has already been passed
+        if(!is_array($id))
+        {
+            // Check the Realm DB for this username
+            $query = "SELECT
+                `id`,
+                `name`,
+                `address`,
+                `port`,
+                `icon`,
+                `flag`,
+                `population`,
+                `gamebuild`
+                FROM `realmlist` WHERE `id`= ?";
+            $this->data = $this->DB->query( $query, array($id) )->fetchRow();
+            
+            // If the result is NOT false, we have a match, username is taken
+            if(!is_array($this->data)) throw new \Exception('Realm Doesnt Exist');
+        }
+        else
+        {
+            $this->data = $id;
+        }
     }
     
 /*

@@ -11,6 +11,7 @@ interface iCharacter
 {
     public function save();
     public function isOnline();
+    public function getId();
     public function getAccountId();
     public function getName();
     public function getLevel();

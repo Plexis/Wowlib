@@ -134,11 +134,11 @@ class Characters implements \Wowlib\iCharacters
     {
         
         if($faction == 1): // Alliance
-            $query = "SELECT COUNT(`online`) FROM `characters` WHERE `online`='1' AND (`race` = 1 OR `race` = 3 OR `race` = 4 OR `race` = 7 OR `race` = 11)";
+            $query = "SELECT COUNT(`online`) FROM `characters` WHERE `online`=1 AND (`race` = 1 OR `race` = 3 OR `race` = 4 OR `race` = 7 OR `race` = 11)";
         elseif($faction == 2): // Horde
-            $query = "SELECT COUNT(`online`) FROM `characters` WHERE `online`='1' AND (`race` = 2 OR `race` = 5 OR `race` = 6 OR `race` = 8 OR `race` = 10)";
+            $query = "SELECT COUNT(`online`) FROM `characters` WHERE `online`=' AND (`race` = 2 OR `race` = 5 OR `race` = 6 OR `race` = 8 OR `race` = 10)";
         else: // Both
-            $query = "SELECT COUNT(`online`) FROM `characters` WHERE `online`='1'";
+            $query = "SELECT COUNT(`online`) FROM `characters` WHERE `online`=1";
         endif;
         
         // Return the query result
@@ -152,35 +152,77 @@ class Characters implements \Wowlib\iCharacters
 |
 | This method returns a list of characters online
 |
-| @Param: (Int) $limit - The number of results we are recieveing
-| @Param: (Int) $start - The result we start from (example: $start = 50
-|   would return results 50-100)
 | @Param: (Int) $faction - Faction ID, 1 = Ally, 2 = Horde, 0 = Both
-| @Retrun: (Array): An array of characters
+| @Param: (Int) $limit - The number of results we are recieveing
+| @Param: (Int) $offset - The result we start from (example: $start = 50
+|   would return results 50-100)
+| @Param: (String) $where - Custom WHERE statement
+| @Retrun: (Array): An array of character objects
 |
 */     
-    public function getOnlineList($limit = 100, $start = 0, $faction = 0)
+    public function getOnlineList($faction = 0, $limit = 50, $offset = 0, $where = null)
     {
+        /*
+            Build a pre query. This query must select the same cloumns as 
+            the query in the Character class constructer uses!
+        */
+        $query = "SELECT 
+            `account`,
+            `guid`,
+            `name`, 
+            `race`, 
+            `class`, 
+            `gender`, 
+            `level`, 
+            `xp`, 
+            `money`, 
+            `position_x`, 
+            `position_y`, 
+            `position_z`, 
+            `map`, 
+            `orientation`,
+            `online`,
+            `totaltime`,
+            `at_login`,
+            `zone`,
+            `arenaPoints`,
+            `totalHonorPoints`,
+            `totalKills`
+            FROM `characters` WHERE `online` = 1 "; 
+        
+        // Append to query based on params
         switch($faction)
         {
             case 1:
                 // Alliance Only
-                $query = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level`, `zone`  FROM `characters` WHERE `online`='1' AND 
-                    (`race` = 1 OR `race` = 3 OR `race` = 4 OR `race` = 7 OR `race` = 11) LIMIT $start, $limit";
+                $query .= "AND (`race` = 1 OR `race` = 3 OR `race` = 4 OR `race` = 7 OR `race` = 11) ";
                 break;
             case 2:
                 // Horde Only
-                $query = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level`, `zone`  FROM `characters` WHERE `online`='1' AND 
-                    (`race` = 2 OR `race` = 5 OR `race` = 6 OR `race` = 8 OR `race` = 10) LIMIT $start, $limit";
+                $query .= "AND (`race` = 2 OR `race` = 5 OR `race` = 6 OR `race` = 8 OR `race` = 10) ";
                 break;
-            default :
+            default:
                 // Both factions
-                $query = "SELECT `guid`, `name`, `race`, `class`, `gender`, `level`, `zone`  FROM `characters` WHERE `online`='1' LIMIT $start, $limit";
                 break;
         }
         
-        // Return the query result
-        return $this->DB->query( $query )->fetchAll();
+        // Prepend custom Where statement
+        if($where != null) $query .= "AND $where";
+        
+        // Prepend Limits
+        $query .= "LIMIT $start, $limit";
+        
+        // Execute the statement
+        $this->DB->query($query);
+        $online = array();
+        
+        // Build an array of character objects
+        while($row = $this->DB->fetchRow())
+        {
+            $online[] = new Character($row, $this);
+        }
+        
+        return $online;
     }
     
 /*

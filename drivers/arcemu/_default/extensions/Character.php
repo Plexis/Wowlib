@@ -53,44 +53,55 @@ class Character implements \Wowlib\iCharacter
 | ---------------------------------------------------------------
 |
 */
-    public function __construct($guid, $parent)
+    public function __construct($id, $parent)
     {
         // Set oru database conntection, which is passed when this class is Init.
         $this->DB = $parent->DB;
         $this->parent = $parent;
-        $this->guid = $guid;
         
-        // Load the character
-        $query = "SELECT 
-            `acct`, 
-            `name`, 
-            `race`, 
-            `class`, 
-            `gender`, 
-            `level`, 
-            `xp`, 
-            `gold`, 
-            `positionX`, 
-            `positionY`, 
-            `positionZ`, 
-            `mapId`, 
-            `orientation`,
-            `online`,
-            `playedtime`,
-            `forced_rename_pending`,
-            `zoneId`,
-            `arenaPoints`,
-            `honorPoints`,
-            `killsLifeTime`,
-            `bindpositionX`,
-            `bindpositionY`,
-            `bindpositionZ`,
-            `bindmapId`,
-            FROM `characters` WHERE `guid`= $guid;";
-        $this->data = $this->DB->query($query)->fetchRow();
+        // Check if the data has already been passed
+        if(!is_array($id))
+        {
+            // Prepare the column name for the WHERE statement based off of $id type
+            $col = (is_int($id)) ? 'guid' : 'name';
         
-        // Make sure we didnt get a false return
-        if(!is_array($this->data)) throw new \Exception('Character doesnt exist');
+            // Load the character
+            $query = "SELECT 
+                `acct`,
+                `guid`, 
+                `name`, 
+                `race`, 
+                `class`, 
+                `gender`, 
+                `level`, 
+                `xp`, 
+                `gold`, 
+                `positionX`, 
+                `positionY`, 
+                `positionZ`, 
+                `mapId`, 
+                `orientation`,
+                `online`,
+                `playedtime`,
+                `forced_rename_pending`,
+                `zoneId`,
+                `arenaPoints`,
+                `honorPoints`,
+                `killsLifeTime`,
+                `bindpositionX`,
+                `bindpositionY`,
+                `bindpositionZ`,
+                `bindmapId`,
+                FROM `characters` WHERE `{$col}`= ?;";
+            $this->data = $this->DB->query($query, array($id))->fetchRow();
+            
+            // Make sure we didnt get a false return
+            if(!is_array($this->data)) throw new \Exception('Character doesnt exist');
+        }
+        else
+        {
+            $this->data = $id;
+        }
     }
     
 /*
@@ -122,6 +133,21 @@ class Character implements \Wowlib\iCharacter
     public function isOnline()
     {
         return (bool) $this->data['online'];
+    }
+    
+/*
+| ---------------------------------------------------------------
+| Method: getId
+| ---------------------------------------------------------------
+|
+| This method returns the characters ID.
+|
+| @Retrun: (Int)
+|
+*/  
+    public function getId()
+    {
+        return (int) $this->data['guid'];
     }
     
 /*
