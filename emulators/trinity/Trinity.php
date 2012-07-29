@@ -1,7 +1,7 @@
 <?php
-/* 
+/*
 | --------------------------------------------------------------
-| 
+|
 | WowLib Framework for WoW Private Server CMS'
 |
 | --------------------------------------------------------------
@@ -17,7 +17,7 @@ class Trinity implements iEmulator
 {
     // Our DB Connection
     public $DB;
-    
+
 /*
 | ---------------------------------------------------------------
 | Constructor
@@ -28,12 +28,12 @@ class Trinity implements iEmulator
     {
         // Set local variables
         $this->DB = $DB;
-        
+
         // Load our extensions needed
         require_once path( WOWLIB_ROOT, 'emulators', 'trinity', 'Account.php' );
         require_once path( WOWLIB_ROOT, 'emulators', 'trinity', 'Realm.php' );
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: realmlist()
@@ -58,17 +58,17 @@ class Trinity implements iEmulator
             `gamebuild`
             FROM `realmlist` ORDER BY `id`";
         $this->DB->query( $query );
-        
+
         // Build the array of realm objects
         $realms = array();
         while($row = $this->DB->fetchRow())
         {
             $realms[] = new Trinity\Realm($row, $this);
         }
-        
+
         return $realms;
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: fetchRealm()
@@ -90,7 +90,7 @@ class Trinity implements iEmulator
         }
         return $realm;
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: uptime()
@@ -109,7 +109,7 @@ class Trinity implements iEmulator
         $result = $this->DB->query( $query, array($id) )->fetchColumn();
         return (time() - $result);
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: createAccount()
@@ -129,27 +129,27 @@ class Trinity implements iEmulator
     {
         // Make sure the username doesnt exist, just incase the script didnt check yet!
         if($this->accountExists($username)) return false;
-        
+
         // SHA1 the password
         $user = strtoupper($username);
         $pass = strtoupper($password);
         $password = sha1($user.':'.$pass);
-        
+
         // Build our tables and values for Database insertion
         $data = array(
-            'username' => $username, 
-            'sha_pass_hash' => $password, 
-            'email' => $email, 
+            'username' => $username,
+            'sha_pass_hash' => $password,
+            'email' => $email,
             'last_ip' => $ip
         );
-        
+
         // Insert into the database
         $this->DB->insert("account", $data);
-        
+
         // If we have an affected row, then we return TRUE
         return ($this->DB->numRows() > 0) ? $this->DB->lastInsertId() : false;
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: validate()
@@ -170,18 +170,18 @@ class Trinity implements iEmulator
         $user = strtoupper($username);
         $pass = strtoupper($password);
         $password = sha1($user.':'.$pass);
-        
+
         // Load the users info from the Realm DB
         $query = "SELECT `id`, `sha_pass_hash` FROM `account` WHERE `username`=?";
         $result = $this->DB->query( $query, array($username) )->fetchRow();
-        
+
         // Make sure the username exists!
         if(!is_array($result)) return false;
-        
+
         // If the result was false, then username is no good. Also match passwords.
-        return ( $result['sha_pass_hash'] == $password ) ? (int) $result['id'] : false;
+        return ( strtolower($result['sha_pass_hash'] ) == $password ) ? (int) $result['id'] : false;
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: fetchAccount()
@@ -205,7 +205,7 @@ class Trinity implements iEmulator
         }
         return $account;
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: accountExists()
@@ -231,7 +231,7 @@ class Trinity implements iEmulator
         $res = $this->DB->query( $query, array($id) )->fetchColumn();
         return ($res !== false);
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: emailExists()
@@ -249,7 +249,7 @@ class Trinity implements iEmulator
         // Check the Realm DB for this username
         $query = "SELECT `username` FROM `account` WHERE `email`=?";
         $res = $this->DB->query( $query, array($email) )->fetchColumn();
-        
+
         // If the result is NOT false, we have a match, username is taken
         return ($res !== false);
     }
@@ -289,7 +289,7 @@ class Trinity implements iEmulator
         $check = $this->DB->query( $query, array($ip) )->fetchColumn();
         return ($check !== FALSE && $check > 0) ? true : false;
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: ban_account()
@@ -304,7 +304,7 @@ class Trinity implements iEmulator
 | @Param: (Bool) $banip - Ban ip as well?
 | @Return (Bool) TRUE on success, FALSE on failure
 |
-*/ 
+*/
     public function banAccount($id, $banreason, $unbandate = NULL, $bannedby = 'Admin', $banip = false)
     {
         // Check for account existance
@@ -314,14 +314,14 @@ class Trinity implements iEmulator
         ($unbandate == NULL) ? $unbandate = (time() + 31556926) : '';
         $data = array(
             'id' => $id,
-            'bandate' => time(), 
-            'unbandate' => $unbandate, 
-            'bannedby' => $bannedby, 
-            'banreason' => $banreason, 
+            'bandate' => time(),
+            'unbandate' => $unbandate,
+            'bannedby' => $bannedby,
+            'banreason' => $banreason,
             'active' => 1
-        ); 
+        );
         $result = $this->DB->insert('account_banned', $data);
-        
+
         // Do we ban the IP as well?
         if($banip == true && $result == true)
         {
@@ -329,7 +329,7 @@ class Trinity implements iEmulator
         }
         return $result;
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: ban_account_ip()
@@ -343,14 +343,14 @@ class Trinity implements iEmulator
 | @Param: (String) $banedby - Who is banning the user?
 | @Return (Bool) TRUE on success, FALSE on failure
 |
-*/ 
+*/
     public function banAccountIp($id, $banreason, $unbandate = NULL, $bannedby = 'Admin')
     {
         // Check for account existance
         $query = "SELECT `last_ip` FROM `account` WHERE `id`=?";
         $ip = $this->DB->query( $query, array($id) )->fetchColumn();
         if(!$ip) return false;
-        
+
         // Check if the IP is already banned or not
         if( $this->ipBanned($ip) ) return true;
 
@@ -358,14 +358,14 @@ class Trinity implements iEmulator
         ($unbandate == NULL) ? $unbandate = (time() + 31556926) : '';
         $data = array(
             'ip' => $ip,
-            'bandate' => time(), 
-            'unbandate' => $unbandate, 
-            'bannedby' => $bannedby, 
-            'banreason' => $banreason, 
-        ); 
+            'bandate' => time(),
+            'unbandate' => $unbandate,
+            'bannedby' => $bannedby,
+            'banreason' => $banreason,
+        );
         return $this->DB->insert('ip_banned', $data);
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: unbanAccount()
@@ -376,16 +376,16 @@ class Trinity implements iEmulator
 | @Param: (Int) $id - The account ID
 | @Return (Bool) TRUE on success, FALSE on failure
 |
-*/ 
+*/
     public function unbanAccount($id)
     {
         // Check if the account is not Banned
         if( !$this->accountBanned($id) ) return true;
-        
+
         // Check for account existance
         return $this->DB->update("account_banned", array('active' => 0), "`id`=".$id);
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: unban_account_ip()
@@ -396,21 +396,21 @@ class Trinity implements iEmulator
 | @Param: (Int) $id - The account ID
 | @Return (Bool) TRUE on success, FALSE on failure
 |
-*/ 
+*/
     public function unbanAccountIp($id)
     {
         // Check for account existance
         $query = "SELECT `last_ip` FROM `accounts` WHERE `id`=?";
         $ip = $this->DB->query( $query, array($id) )->fetchColumn();
         if(!$ip) return false;
-        
+
         // Check if the IP is banned or not
         if( !$this->ipBanned($ip) ) return true;
-        
+
         // Check for account existance
         return $this->DB->delete("ip_banned", "`ip`=".$ip);
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Method: delete_account()
@@ -421,16 +421,16 @@ class Trinity implements iEmulator
 | @Param: (Int) $id - The account ID
 | @Return (Bool) TRUE on success, FALSE on failure
 |
-*/ 
+*/
     public function deleteAccount($id)
     {
         // Delete any bans
         $this->unbanAccount($id);
-        
+
         // Delete the account
         return $this->DB->delete("account", "`id`=".$id);
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Function: expansions()
@@ -447,7 +447,7 @@ class Trinity implements iEmulator
 |   4 => MoP (If Supported)
 |
 */
-    
+
     public function expansions()
     {
         // Expansion ID => Expansion Name
@@ -457,7 +457,7 @@ class Trinity implements iEmulator
             2 => "Wrath of the Lich King"
         );
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Function: expansionToText()
@@ -468,14 +468,14 @@ class Trinity implements iEmulator
 | @Return (String) Returns false if the expansion doesnt exist
 |
 */
-    
+
     public function expansionToText($id = 0)
     {
         // return all expansions if no id is passed
         $exp = $this->expansions();
         return (isset($exp[$id])) ? $exp[$id] : false;
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Function: expansionToBit()
@@ -486,7 +486,7 @@ class Trinity implements iEmulator
 | @Return (Int)
 |
 */
-    
+
     public function expansionToBit($e)
     {
         switch($e)
@@ -501,7 +501,7 @@ class Trinity implements iEmulator
                 return 2;
         }
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Function: numAccounts()
@@ -512,12 +512,12 @@ class Trinity implements iEmulator
 | @Return (Int) The number of accounts
 |
 */
-    
+
     public function numAccounts()
     {
         return $this->DB->query("SELECT COUNT(`id`) FROM `account`")->fetchColumn();
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Function: numBannedAccounts()
@@ -528,12 +528,12 @@ class Trinity implements iEmulator
 | @Return (Int) The number of accounts
 |
 */
-    
+
     public function numBannedAccounts()
     {
         return $this->DB->query("SELECT COUNT(`id`) FROM `account_banned` WHERE `active` = 1")->fetchColumn();
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Function: numInactiveAccounts()
@@ -545,7 +545,7 @@ class Trinity implements iEmulator
 | @Return (Int) The number of accounts
 |
 */
-    
+
     public function numInactiveAccounts()
     {
         // 90 days or older
@@ -553,7 +553,7 @@ class Trinity implements iEmulator
         $query = "SELECT COUNT(`id`) FROM `account` WHERE UNIX_TIMESTAMP(`last_login`) <  $time";
         return $this->DB->query( $query )->fetchColumn();
     }
-    
+
 /*
 | ---------------------------------------------------------------
 | Function: numActiveAccounts()
@@ -565,7 +565,7 @@ class Trinity implements iEmulator
 | @Return (Int) The number of accounts
 |
 */
-    
+
     public function numActiveAccounts()
     {
         // 90 days or older
