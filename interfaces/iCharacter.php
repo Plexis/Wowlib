@@ -1,12 +1,21 @@
 <?php
-namespace Wowlib;
-
-/*
+/* 
+| --------------------------------------------------------------
+| 
+| WowLib Framework for WoW Private Server CMS'
+|
+| --------------------------------------------------------------
+|
+| Author:       Steven Wilson
+| Copyright:    Copyright (c) 2012, Plexis Dev Team
+| License:      GNU GPL v3
+|
 | ---------------------------------------------------------------
 | Character Interface
 | ---------------------------------------------------------------
-|
 */
+namespace Wowlib;
+
 interface iCharacter
 {
     public function save();

@@ -63,7 +63,7 @@ $Driver = Wowlib::load('_default', $connC, null);
 
 // The driver... Each method under the driver object, is a class that is loacated
 // inside the loaded driver folder "drivers/$emulator/_default" in this case
-$Character = $Driver->characters->fetch( $charId );
+$Character = $Driver->characters->fetch( 2 );
 if(is_object($Character))
 {
     echo "<br /><br />This character's name is ". $Character->getName() ." and he is level ". $Character->getLevel() ."!";

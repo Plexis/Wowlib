@@ -17,7 +17,6 @@ if(!function_exists('path'))
     function path()
     {
         // Determine if we are one windows, And get our path parts
-        $IsWindows = strtoupper( substr(PHP_OS, 0, 3) ) === "WIN";
         $args = func_get_args();
         $parts = array();
         
@@ -28,28 +27,7 @@ if(!function_exists('path'))
         }
 
         // Get our cleaned path into a variable with the correct directory seperator
-        $newPath = implode( DS, $parts );
-        
-        // Do some checking for illegal path chars
-        if( $IsWindows )
-        {
-            $IllegalChars = "\\/:?*\"<>|\r\n";
-            $Pattern = "~[" . $IllegalChars . "]+~";
-            $tempPath = preg_replace( "~^[A-Z]{1}:~", "", $newPath );
-            $tempPath = trim( $tempPath, DS );
-            $tempPath = explode( DS, $tempPath );
-            
-            foreach( $tempPath as $part )
-            {
-                if( preg_match( $Pattern, $part ) )
-                {
-                    show_error( "illegal_chars_in_path", array( $part ) );
-                    return null;
-                }
-            }
-        }
-        
-        return $newPath;
+        return implode( DS, $parts );
     }
 }
 
@@ -158,6 +136,32 @@ if(!function_exists('wowlib_list_folders'))
             return $folders;
         }
         return false;
+    }
+}
+
+/*
+| ---------------------------------------------------------------
+| Function: expansionToText()
+| ---------------------------------------------------------------
+|
+| Returns the expansion text name
+|
+| @Return (String) Returns false if the expansion doesnt exist
+|
+*/
+if(!function_exists('expansionToText'))
+{  
+    function expansionToText($id = 0)
+    {
+        // return all expansions if no id is passed
+        $exp = array(
+            0 => 'Classic',
+            1 => 'The Burning Crusade',
+            2 => 'Wrath of the Lich King',
+            3 => 'Cataclysm',
+            4 => 'Mists Of Pandaria'
+        );
+        return (isset($exp[$id])) ? $exp[$id] : false;
     }
 }
 ?>

@@ -1,20 +1,29 @@
 <?php
-namespace Wowlib;
-
-/*
+/* 
+| --------------------------------------------------------------
+| 
+| WowLib Framework for WoW Private Server CMS'
+|
+| --------------------------------------------------------------
+|
+| Author:       Steven Wilson
+| Copyright:    Copyright (c) 2012, Plexis Dev Team
+| License:      GNU GPL v3
+|
 | ---------------------------------------------------------------
 | Characters Interface
 | ---------------------------------------------------------------
-|
 */
+namespace Wowlib;
+
 interface iCharacters
 {
     public function nameExists($name);
     public function fetch($id);
     public function getOnlineCount($faction = 0);
-    public function getOnlineList($faction = 0, $limit = 50, $offset = 0, $where = null);
-    public function listCharacters($acct = 0, $limit = 50, $start = 0);
-    public function topKills($faction, $limit, $start);
+    public function getOnlineList($config = array());
+    public function getCharacterList($config = array());
+    public function topKills($config = array());
     public function delete($id);
     public function loginFlags();
     public function flagToBit($flag);
