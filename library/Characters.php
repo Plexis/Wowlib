@@ -81,7 +81,7 @@ class Characters implements iCharacters
         // Build our query
         $query = "SELECT `{$guid}` FROM `{$table}` WHERE `{$cname}`=?";
         $exists = $this->DB->query( $query, array($name) )->fetchColumn();
-        return ($exists !== false) ? true : false;
+        return ($exists !== false);
     }
     
 /*
@@ -119,7 +119,7 @@ class Characters implements iCharacters
         if(!is_array($data)) return false;
         
         // Get the parent namespace if a sub class exists
-        if($this->parent->classExists('Character'))
+        if($this->parent->driverHasExt('Character'))
         {
             $namespace = $this->parent->getDriverNamespace();
             $class = $namespace ."\\Character";
@@ -224,7 +224,7 @@ class Characters implements iCharacters
         $online = array();
         
         // Get the parent namespace if a sub class exists
-        if($this->parent->classExists('Character'))
+        if($this->parent->driverHasExt('Character'))
         {
             $namespace = $this->parent->getDriverNamespace();
             $class = $namespace ."\\Character";
@@ -288,7 +288,7 @@ class Characters implements iCharacters
         $online = array();
         
         // Get the parent namespace if a sub class exists
-        if($this->parent->classExists('Character'))
+        if($this->parent->driverHasExt('Character'))
         {
             $namespace = $this->parent->getDriverNamespace();
             $class = $namespace ."\\Character";
@@ -352,7 +352,7 @@ class Characters implements iCharacters
         $online = array();
         
         // Get the parent namespace if a sub class exists
-        if($this->parent->classExists('Character'))
+        if($this->parent->driverHasExt('Character'))
         {
             $namespace = $this->parent->getDriverNamespace();
             $class = $namespace ."\\Character";

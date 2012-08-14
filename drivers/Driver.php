@@ -76,7 +76,7 @@ class Driver
     
 /*
 | ---------------------------------------------------------------
-| Method: classExists()
+| Method: driverHasExt()
 | ---------------------------------------------------------------
 |
 | This method returns if the namespaced driver class exists, and
@@ -88,7 +88,7 @@ class Driver
 | @Return: (Object)
 |
 */
-    public function classExists($name, $include = true)
+    public function driverHasExt($name, $include = true)
     {
         $name = ucfirst( strtolower($name) );
         $driver = strtolower($this->driver);

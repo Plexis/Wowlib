@@ -361,7 +361,7 @@ class Emulator implements iEmulator
         // Get our table and column names
         $table = $this->config['accountTable'];
         $columns = $this->config['accountColumns'];
-        $passcol = ($cols['shaPassword'] != false) ? $cols['shaPassword'] : $cols['password'];
+        $passcol = ($columns['shaPassword'] != false) ? $columns['shaPassword'] : $columns['password'];
         
         // Prepare the column names
         $cols = "`". implode('`, `', $columns) ."`";
